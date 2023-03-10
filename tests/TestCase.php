@@ -3,8 +3,8 @@
 namespace Koellich\LaravelPersources\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Koellich\LaravelPersources\LaravelPersourcesServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {

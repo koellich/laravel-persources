@@ -2,9 +2,9 @@
 
 namespace Koellich\LaravelPersources;
 
+use Koellich\LaravelPersources\Commands\LaravelPersourcesCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Koellich\LaravelPersources\Commands\LaravelPersourcesCommand;
 
 class LaravelPersourcesServiceProvider extends PackageServiceProvider
 {
