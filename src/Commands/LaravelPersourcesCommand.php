@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Koellich\LaravelPersources\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelPersourcesCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-persources';
 
     public $description = 'My command';
 

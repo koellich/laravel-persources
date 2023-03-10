@@ -1,24 +1,25 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "koellich/laravel-persources",
+    "description": "Permission based resources with CRUD routing for your models",
     "keywords": [
-        ":vendor_name",
+        "koellich",
         "laravel",
-        ":package_slug"
+        "laravel-persources"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/koellich/laravel-persources",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "koellich",
+            "email": "florian@koellich.com",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.1",
+        "illuminate/contracts": "^10.0",
         "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0"
+        "spatie/laravel-permission": "^5.9"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
@@ -35,13 +36,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "Koellich\\LaravelPersources\\": "src",
+            "Koellich\\LaravelPersources\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "Koellich\\LaravelPersources\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -61,10 +62,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Koellich\\LaravelPersources\\LaravelPersourcesServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "LaravelPersources": "Koellich\\LaravelPersources\\Facades\\LaravelPersources"
             }
         }
     },
