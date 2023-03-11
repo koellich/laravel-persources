@@ -13,7 +13,7 @@ laravel-persources expands on [spatie/laravel-permission](https://spatie.be/docs
 Let's say you have a model called ```Car``` that you want to expose in your frontend:
 
 ```bash
-php artisan make:persource Car
+php artisan make:persource Car list view create update delete
 ```
 
 to generate the following:
@@ -22,13 +22,14 @@ to generate the following:
 
 | Permission  | Route             | Views                                     |
 |-------------|-------------------|-------------------------------------------|
-| car.list    | GET /cars         | resources/persources/cars/list.blade.html |
-| car.view    | GET /cars/{id}    | resources/persources/cars/view.blade.html |
-| car.update  | PATCH /cars/{id}  |  |
-| car.delete  | DELETE /cars/{id} |  |
+| cars.list   | GET /cars         | resources/persources/cars/list.blade.html |
+| cars.view   | GET /cars/{id}    | resources/persources/cars/view.blade.html |
+| cars.create | POST /cars/{id}   |                                           |
+| cars.update | PATCH /cars/{id}  |                                           |
+| cars.delete | DELETE /cars/{id} |                                           |
 
-If a user who visits `https://yourapp/cars` has the permission `car.list` either directly or indirectly via a role then the `list.blade.html` will be rendered. Otherwise, a 403 error will be returned.
-Persources was designed with Livewire in mind, but you can customize everything to use Vue.js if that is your preferred front end stack.
+If a user who visits `https://yourapp/cars` has the permission `cars.list` either directly or indirectly via a role then the `.../cars/list.blade.html` will be rendered. Otherwise, a 403 error will be returned.
+Persources was designed with Livewire in mind, but you can customize everything to suit your preferred front end stack, e.g. Vue.js.
 
 **Resource**
 
@@ -37,6 +38,16 @@ Persources was designed with Livewire in mind, but you can customize everything 
 This is the glue between your ```Car``` model and the routes & views. 
 It allows you to fine tune what attributes of your model are passed to the views, which attributes can be edited, which views to use and much more.
 
+Routes are generated at runtime. This means you will only have those routes that correspond to your resource's `$permissions` attribute.
+
+**What if I already have permissions?**
+
+In this case, run:
+```bash
+php artisan make:persource Car none
+```
+
+and then paste your existing permissions into the resource's `$permissions` attribute.
 
 ## Installation
 
@@ -44,13 +55,6 @@ You can install the package via composer:
 
 ```bash
 composer require koellich/laravel-persources
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-persources-migrations"
-php artisan migrate
 ```
 
 You can publish the config file with:

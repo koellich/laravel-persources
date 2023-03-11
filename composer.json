@@ -4,7 +4,10 @@
     "keywords": [
         "koellich",
         "laravel",
-        "laravel-persources"
+        "laravel-persources",
+        "resources",
+        "CRUD",
+        "routes"
     ],
     "homepage": "https://github.com/koellich/laravel-persources",
     "license": "MIT",
@@ -36,13 +39,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Koellich\\LaravelPersources\\": "src",
-            "Koellich\\LaravelPersources\\Database\\Factories\\": "database/factories"
+            "Koellich\\Persources\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Koellich\\LaravelPersources\\Tests\\": "tests"
+            "Koellich\\Persources\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -62,11 +64,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Koellich\\LaravelPersources\\LaravelPersourcesServiceProvider"
-            ],
-            "aliases": {
-                "LaravelPersources": "Koellich\\LaravelPersources\\Facades\\LaravelPersources"
-            }
+                "Koellich\\Persources\\PersourcesServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",
