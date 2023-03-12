@@ -3,12 +3,10 @@
 use Illuminate\Support\Facades\Artisan;
 
 it('should create Permissions', function () {
-
     Artisan::call('make:persource Car');
 
     expect(false)->toBeTrue();
 });
-
 
 it('should create views', function () {
     $list = resource_path('resources/persources/cars/list.blade.html');

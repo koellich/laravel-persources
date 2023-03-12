@@ -2,9 +2,9 @@
 
 namespace Koellich\Persources;
 
+use Koellich\Persources\Commands\MakePersourceCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Koellich\Persources\Commands\MakePersourceCommand;
 
 class PersourcesServiceProvider extends PackageServiceProvider
 {
@@ -19,7 +19,7 @@ class PersourcesServiceProvider extends PackageServiceProvider
             ->name('laravel-persources')
             ->hasConfigFile()
             ->hasTranslations()
-            ->hasRoutes("web")
+            ->hasRoutes('web')
             ->hasCommand(MakePersourceCommand::class);
     }
 

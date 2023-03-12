@@ -15,19 +15,19 @@ class MakePersourceCommand extends Command
 
     public function handle(): int
     {
-        $model = $this->argument("model");
+        $model = $this->argument('model');
         // assume default namespace if it is not specified
-        if (!str_contains("\\", $model)) {
+        if (! str_contains('\\', $model)) {
             $model = "App\\Models\\$model";
         }
-        $actions = $this->argument("actions");
+        $actions = $this->argument('actions');
 
         $this->info("Generate Resource for Model $model");
-        $this->info(count($actions)==0 ?
+        $this->info(count($actions) == 0 ?
             "Do not generate any permissions. Be sure to add them to the resource's \$permissions attribute" :
-            "Generate Permissions for actions: " . implode(", ", $actions));
+            'Generate Permissions for actions: '.implode(', ', $actions));
 
-        $singularName = $this->last( "\\", $model);
+        $singularName = $this->last('\\', $model);
         $pluralName = Str::plural($singularName);
 
         $this->info('All done');
@@ -36,13 +36,12 @@ class MakePersourceCommand extends Command
     }
 
     /**
-     * @param string $separator
-     * @param string $string
      * @return string The last part of a $string separatated by $separator
      */
     private function last(string $separator, string $string)
     {
         $parts = explode($separator, $string);
+
         return $parts[array_key_last($parts)];
     }
 }
