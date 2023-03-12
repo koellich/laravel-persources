@@ -72,7 +72,8 @@ class Persources
             return true;
         }
         try {
-            $user->getAllPermissions()->sole(fn($p) => $p->name == $permission);
+            $user->getAllPermissions()->sole(fn ($p) => $p->name == $permission);
+
             return true;
         } catch (ItemNotFoundException) {
             return false;
@@ -104,7 +105,6 @@ class Persources
     }
 
     /**
-     * @param string $action
      * @return string The HTTP action required to perform the action.
      */
     public function getHttpMethod(string $action): string

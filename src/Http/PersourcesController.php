@@ -4,8 +4,6 @@ namespace Koellich\Persources\Http;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\Str;
 use Koellich\Persources\Facades\Persources;
 
@@ -21,7 +19,7 @@ class PersourcesController extends Controller
             abort(500, __('persources::translations.500_unnamed_route', ['route' => $request->path()]));
         }
 
-        if (!Persources::checkPermission($permission)) {
+        if (! Persources::checkPermission($permission)) {
             abort(403, __('persources::translations.403_no_permission', ['permission' => $permission]));
         }
 

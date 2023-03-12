@@ -60,7 +60,7 @@ class MakePersourceCommand extends Command
                     $permissions[] = $permission;
                     try {
                         $permissionModel::create([
-                            'name' => $permission
+                            'name' => $permission,
                         ]);
                         $this->info("Created $permissionModel for $permission");
                     } catch (PermissionAlreadyExists) {

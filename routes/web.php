@@ -13,8 +13,8 @@ Route::middleware(config('persources.middleware_group'))
                 $impliedActions = Persources::getImpliedActions($action);
                 foreach ($impliedActions as $impliedAction) {
                     // from a permission something.car.read we generate the route <persources.route_root>/something/car
-                    $route = str_replace(".", "/", str_replace($action, '', $permission));
-                    $route = strtolower(trim(config('persources.route_root') . '/' . $route, '/'));
+                    $route = str_replace('.', '/', str_replace($action, '', $permission));
+                    $route = strtolower(trim(config('persources.route_root').'/'.$route, '/'));
                     if (in_array($impliedAction, ['view', 'update', 'delete'])) {
                         $route .= '/{id}';
                     }

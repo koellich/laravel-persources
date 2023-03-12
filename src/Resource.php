@@ -102,7 +102,7 @@ class Resource
         return implode('.', [$root, strtolower($this->pluralName), $action]);
     }
 
-    public function getHttpMethod(String $action)
+    public function getHttpMethod(string $action)
     {
         return Facades\Persources::getHttpMethod($action);
     }
@@ -110,20 +110,20 @@ class Resource
     /**
      * From all $actions supported by this Resource, this method returns only the ones that the user may perform
      * according to his permissions.
-     * @return array
      */
-    public function getActionsForCurrentUser(): array {
+    public function getActionsForCurrentUser(): array
+    {
         $userActions = [];
         foreach ($this->actions as $action) {
             foreach ($this->permissions as $permission) {
-                if (!in_array($action, $userActions) &&
-                    in_array($action, Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission)))   &&
-                    Facades\Persources::checkPermission($permission))
-                {
+                if (! in_array($action, $userActions) &&
+                    in_array($action, Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission))) &&
+                    Facades\Persources::checkPermission($permission)) {
                     $userActions[] = $action;
                 }
             }
         }
+
         return $userActions;
     }
 
