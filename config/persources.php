@@ -47,4 +47,16 @@ return [
     */
 
     'middleware_group' => env('PERSOURCES_MIDDLEWARE_GROUP', 'web'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Role
+    |--------------------------------------------------------------------------
+    |
+    | This is the Role which can access all resources regardless of permissions.
+    | Set this to null if you do not want to have an admin role.
+    |
+    */
+
+    'admin_role' => env('PERSOURCES_ADMIN_PERMISSION', 'admin'),
 ];

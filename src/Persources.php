@@ -3,7 +3,9 @@
 namespace Koellich\Persources;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\Str;
 
 class Persources
@@ -62,6 +64,21 @@ class Persources
         return resource_path(config('persources.view_root'));
     }
 
+    public function checkPermission(string $permission): bool
+    {
+        $user = Auth::user();
+        $adminRole = config('persources.admin_role');
+        if ($adminRole && $user->hasRole($adminRole)) {
+            return true;
+        }
+        try {
+            $user->getAllPermissions()->sole(fn($p) => $p->name == $permission);
+            return true;
+        } catch (ItemNotFoundException) {
+            return false;
+        }
+    }
+
     /**
      * @return string The action part of the permission. E.g. For 'cars.list' the result would be 'list'
      */
@@ -83,6 +100,20 @@ class Persources
             'read' => ['list', 'view'],
             'write' => ['list', 'view', 'create', 'update'],
             default => [$action]
+        };
+    }
+
+    /**
+     * @param string $action
+     * @return string The HTTP action required to perform the action.
+     */
+    public function getHttpMethod(string $action): string
+    {
+        return match ($action) {
+            'list', 'view' => 'GET',
+            'create' => 'POST',
+            'update' => 'PATCH',
+            'delete' => 'DELETE'
         };
     }
 

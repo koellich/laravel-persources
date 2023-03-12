@@ -2,7 +2,6 @@
 
 namespace Koellich\Persources;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Response;
@@ -103,14 +102,29 @@ class Resource
         return implode('.', [$root, strtolower($this->pluralName), $action]);
     }
 
-    public function getRoute($action, $id): string
+    public function getHttpMethod(String $action)
     {
-        $route = strtolower($this->pluralName);
-        if (in_array($action, ['view', 'update', 'delete'])) {
-            return $route."/$id";
-        } else {
-            return $route;
+        return Facades\Persources::getHttpMethod($action);
+    }
+
+    /**
+     * From all $actions supported by this Resource, this method returns only the ones that the user may perform
+     * according to his permissions.
+     * @return array
+     */
+    public function getActionsForCurrentUser(): array {
+        $userActions = [];
+        foreach ($this->actions as $action) {
+            foreach ($this->permissions as $permission) {
+                if (!in_array($action, $userActions) &&
+                    in_array($action, Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission)))   &&
+                    Facades\Persources::checkPermission($permission))
+                {
+                    $userActions[] = $action;
+                }
+            }
         }
+        return $userActions;
     }
 
     /**

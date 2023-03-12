@@ -6,12 +6,14 @@ use Illuminate\Support\Facades\Facade;
 use Koellich\Persources\Resource;
 
 /**
+ * @method static bool checkPermission(string $permission)
  * @method static Resource|null getResourceFor(string $permission)
  * @method static array getResources()
  * @method static void registerResources()
  * @method static string getResourcesPath()
  * @method static string getViewsPath()
  * @method static string getAction(string $permission)
+ * @method static string getHttpMethod(string $action)
  * @method static array getImpliedActions(string $action)
  * @method static string getRouteName(string $permission, string $impliedAction)
  *

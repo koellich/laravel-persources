@@ -25,9 +25,11 @@
             <td>{{ $item[$lia] }}</td>
             @endforeach
             <td>
-                @foreach($resource->actions as $action)
-                    @if($action !== 'create')
-                    <a href="{{ $resource->getRoute($action, $item['id']) }}">{{ trans($action) }}</a>
+                @foreach($resource->getActionsForCurrentUser() as $action)
+                    @if($action !== 'create' && $action !== 'update')
+                    <button onclick="performAction({{ $item['id'] }}, '{{ $resource->getHttpMethod($action) }}')">
+                        {{ trans($action) }}
+                    </button>
                     @endif
                 @endforeach
             </td>
@@ -36,5 +38,21 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    function performAction(id, method) {
+        console.log('performAction', id, method);
+        let url = window.location + '/' + id;
+        if (method === 'GET') {
+            window.location = url;
+        } else {
+            fetch(url, {
+                method: method
+            }).then(
+                (response) => alert(response.status + ' ' + response.statusText),
+                (reason) => alert(reason));
+        }
+    }
+</script>
 
 @endsection
