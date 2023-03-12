@@ -22,11 +22,10 @@ class Persources
         $path = $this->getResourcesPath();
         if (File::exists($path)) {
             foreach (File::allFiles($path) as $file) {
-                $class = config('persources.namespace').'\\'.basename($file, '.php');
-                ray($class);
+                $class = config('persources.resources_namespace').'\\'.basename($file, '.php');
                 $resource = new $class();
                 foreach ($resource->getPermissions() as $permission) {
-                    App::singleton($permission, $resource);
+                    App::singleton($permission, $class);
                 }
                 $this->resources[] = $resource;
             }
@@ -40,6 +39,8 @@ class Persources
 
     /**
      * Returns the Resource responsible for handling requests for the given $permission.
+     * Prefixes are ignores, i.e. resources may be named like something.cars.edit which will match the
+     * resource registered for cars.edit
      *
      * @return resource
      */
@@ -56,10 +57,44 @@ class Persources
         );
     }
 
+    public function getViewsPath(): string
+    {
+        return resource_path(config('persources.view_root'));
+    }
+
+    /**
+     * @param string $permission
+     * @return string The action part of the permission. E.g. For 'cars.list' the result would be 'list'
+     */
     public function getAction(string $permission): string
     {
-        $parts = explode('.', $permission);
-
-        return $parts[array_key_last($parts)];
+        return Str::of($permission)->afterLast('.');
     }
+
+    /**
+     * Returns an array of actions that are implied by the given $action.
+     * E.g. For $action == '...read' the result would be ['...list', '...view']
+     *
+     * @param string $permission
+     * @return string
+     */
+    public function getImpliedActions(string $action): array
+    {
+        return match ($action) {
+            'read' => ['list', 'view'],
+            'write' => ['list', 'view', 'create', 'update'],
+            default => [$action]
+        };
+    }
+
+    /**
+     * @param string $permission
+     * @return string route name
+     */
+    public function getRouteName(string $permission, string $impliedAction): string
+    {
+        $hasImpliedActions = in_array($this->getAction($permission), ['read', 'write']);
+        return $hasImpliedActions ? "$permission|$impliedAction" : $permission;
+    }
+
 }

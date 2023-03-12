@@ -2,9 +2,9 @@
 
 namespace Koellich\Persources;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Response;
 
 class Resource
@@ -12,41 +12,46 @@ class Resource
     /**
      * @var string Full qualified name of the Model that this resource represents.
      */
-    protected string $model;
+    public string $model;
 
     /**
      * @var string Singular Name of the resource.
      */
-    protected string $singularName;
+    public string $singularName;
 
     /**
      * @var string Plural name of the resource.
      */
-    protected string $pluralName;
+    public string $pluralName;
 
     /**
      * @var array Array of permissions (string) that are handled by this resource.
      */
-    protected array $permissions = [];
+    public array $permissions = [];
 
     /**
      * @var array Array of model attributes that can be used when displaying a list of models.
      */
-    protected array $listItemAttributes = [];
+    public array $listItemAttributes = [];
 
     /**
      * @var array Array of model attributes that can be used when displaying a single model.
      */
-    protected array $singleItemAttributes = [];
+    public array $singleItemAttributes = [];
+
+    /**
+     * @var array Array of actions that are available.
+     */
+    public array $actions = [];
 
     public function list(Request $request)
     {
-        return view($this->getView('list'), ['items' => $this->getItems($request)]);
+        return view($this->getView('list'), ['resource' => $this, 'items' => $this->getItems($request)]);
     }
 
     public function view(Request $request, $id)
     {
-        return view($this->getView('view'), ['item' => $this->getItem($request, $id)]);
+        return view($this->getView('view'), ['resource' => $this, 'item' => $this->getItem($request, $id)]);
     }
 
     public function create(Request $request)
@@ -81,33 +86,36 @@ class Resource
     /**
      * Returns a list of all Models that fit the request
      */
-    protected function getItems(Request $request): Collection
+    public function getItems(Request $request): Collection
     {
-        return $this->getModelClassName()::all()->only($this->listItemAttributes);
+        return $this->getModelClassName()::all()->map->only($this->listItemAttributes);
     }
 
-    protected function getItem(Request $request, $id): Model
+    public function getItem(Request $request, $id): array
     {
         return $this->getModelClassName()::find($id)->only($this->singleItemAttributes);
     }
 
-    /**
-     * Returns the translation of the $name
-     */
-    protected function getName()
+    public function getView(string $action)
     {
-        return __($this->name);
+        $root = str_replace("/", ".", str_replace("views/", "", config('persources.view_root')));
+        return implode('.', [$root, strtolower($this->pluralName), $action]);
     }
 
-    protected function getView(string $action)
+    public function getRoute($action, $id): string
     {
-        return implode('.', [config('view_root'), $this->pluralName, $action]);
+        $route = strtolower($this->pluralName);
+        if (in_array($action, ['view', 'update', 'delete'])) {
+            return $route . "/$id";
+        } else {
+            return $route;
+        }
     }
 
     /**
      * Returns the class name for the model that can be used for static calls
      */
-    private function getModelClassName(): string
+    public function getModelClassName(): string
     {
         return '\\'.$this->model;
     }

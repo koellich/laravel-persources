@@ -10,17 +10,21 @@ Route::middleware(config('persources.middleware_group'))
         foreach (Persources::getResources() as $resource) {
             foreach ($resource->getPermissions() as $permission) {
                 $action = Persources::getAction($permission);
-                $route = trim(config('persources.route_root').'/'.$resource->pluralName, '/');
-                if (in_array($action, ['view', 'update', 'delete'])) {
-                    $route .= '/{id}';
+                $impliedActions = Persources::getImpliedActions($action);
+                foreach ($impliedActions as $impliedAction) {
+                    $route = strtolower(trim(config('persources.route_root') . '/' . $resource->pluralName, '/'));
+                    if (in_array($impliedAction, ['view', 'update', 'delete'])) {
+                        $route .= '/{id}';
+                    }
+                    $method = match ($impliedAction) {
+                        'list', 'view' => 'GET',
+                        'create' => 'POST',
+                        'update' => 'PATCH',
+                        'delete' => 'DELETE'
+                    };
+                    $routeName = Persources::getRouteName($permission, $impliedAction);
+                    Route::addRoute($method, $route, PersourcesController::class)->name($routeName);
                 }
-                $method = match ($action) {
-                    'list', 'view' => 'GET',
-                    'create' => 'POST',
-                    'update' => 'PATCH',
-                    'delete' => 'DELETE'
-                };
-                Route::addRoute($method, $route, PersourcesController::class)->name($permission);
             }
         }
     });

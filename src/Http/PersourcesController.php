@@ -5,13 +5,17 @@ namespace Koellich\Persources\Http;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Koellich\Persources\Facades\Persources;
 
 class PersourcesController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $permission = str_replace('persources.', '', $request->route()->getName());
+        // the route name is "persources.PERMISSION|action
+        // so it could be persources.cars.read|list, persources.something.cars.read|view, persources.xyz.cars.list|list
+        $routeName = Str::of($request->route()->getName());
+        $permission = str_replace('persources.', '', $routeName->beforeLast('|'));
         if (! $permission) {
             abort(500, __('laravel-persources::translations.500_unnamed_route', ['route' => $request->path()]));
         }
@@ -24,7 +28,8 @@ class PersourcesController extends Controller
             abort(500, __('laravel-persources::translations.500_no_resource', ['permission' => $permission]));
         }
 
-        $action = $this->getAction($permission);
+        $action = $routeName->afterLast('|')->toString();
+        $action = $action ?: Persources::getAction($permission);
         $id = $request->route('id');
 
         return match ($action) {

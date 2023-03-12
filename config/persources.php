@@ -30,11 +30,12 @@ return [
     | View Root Path
     |--------------------------------------------------------------------------
     |
-    | This is the path under which the view templates are generated.
+    | This is the path under which the view templates are generated in the
+    | resources path.
     |
     */
 
-    'view_root' => env('PERSOURCES_VIEWS_ROOT', resource_path('views/persources')),
+    'view_root' => env('PERSOURCES_VIEWS_ROOT', 'views/persources'),
 
     /*
     |--------------------------------------------------------------------------

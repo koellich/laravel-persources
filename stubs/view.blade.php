@@ -14,8 +14,8 @@
         <tbody>
             @foreach($resource->singleItemAttributes as $sia)
             <tr>
-                <th role="row">{{ $sia }}</th>
-                <td>{{ $item->{$sia} }}</td>
+                <th role="row">{{ trans($sia) }}</th>
+                <td>{{ $item[$sia] }}</td>
             </tr>
             @endforeach
         </tbody>

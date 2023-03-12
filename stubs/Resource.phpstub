@@ -1,0 +1,44 @@
+<?php
+
+namespace %NAMESPACE%;
+
+use Koellich\Persources\Resource;
+
+class %RESOURCE% extends Resource
+{
+    /**
+     * @var string Full qualified name of the Model that this resource represents.
+     */
+    public string $model = %MODEL%;
+
+    /**
+     * @var string Singular Name of the resource.
+     */
+    public string $singularName = %SINGULAR_NAME%;
+
+    /**
+     * @var string Plural name of the resource.
+     */
+    public string $pluralName = %PLURAL_NAME%;
+
+    /**
+     * @var array Array of permissions (string) that are handled by this resource.
+     */
+    public array $permissions = %PERMISSIONS%;
+
+    /**
+     * @var array Array of model attributes that can be used when displaying a list of models.
+     */
+    public array $listItemAttributes = %LISTITEM_ATTRIBUTES%;
+
+    /**
+     * @var array Array of permissions (string) that are handled by this resource.
+     */
+    public array $singleItemAttributes = %SINGLEITEM_ATTRIBUTES%;
+
+    /**
+     * @var array Array of actions that are available.
+     */
+    public array $actions = %ACTIONS%;
+
+}

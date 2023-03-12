@@ -10,7 +10,10 @@ use Koellich\Persources\Resource;
  * @method static array getResources()
  * @method static void registerResources()
  * @method static string getResourcesPath()
+ * @method static string getViewsPath()
  * @method static string getAction(string $permission)
+ * @method static array getImpliedActions(string $action)
+ * @method static string getRouteName(string $permission, string $impliedAction)
  *
  * @see \Koellich\Persources\Persources
  */
