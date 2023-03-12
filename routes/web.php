@@ -12,7 +12,7 @@ Route::middleware(config('persources.middleware_group'))
                 $action = Persources::getAction($permission);
                 $impliedActions = Persources::getImpliedActions($action);
                 foreach ($impliedActions as $impliedAction) {
-                    $route = strtolower(trim(config('persources.route_root') . '/' . $resource->pluralName, '/'));
+                    $route = strtolower(trim(config('persources.route_root').'/'.$resource->pluralName, '/'));
                     if (in_array($impliedAction, ['view', 'update', 'delete'])) {
                         $route .= '/{id}';
                     }

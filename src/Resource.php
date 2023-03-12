@@ -98,7 +98,8 @@ class Resource
 
     public function getView(string $action)
     {
-        $root = str_replace("/", ".", str_replace("views/", "", config('persources.view_root')));
+        $root = str_replace('/', '.', str_replace('views/', '', config('persources.view_root')));
+
         return implode('.', [$root, strtolower($this->pluralName), $action]);
     }
 
@@ -106,7 +107,7 @@ class Resource
     {
         $route = strtolower($this->pluralName);
         if (in_array($action, ['view', 'update', 'delete'])) {
-            return $route . "/$id";
+            return $route."/$id";
         } else {
             return $route;
         }

@@ -63,7 +63,6 @@ class Persources
     }
 
     /**
-     * @param string $permission
      * @return string The action part of the permission. E.g. For 'cars.list' the result would be 'list'
      */
     public function getAction(string $permission): string
@@ -75,7 +74,7 @@ class Persources
      * Returns an array of actions that are implied by the given $action.
      * E.g. For $action == '...read' the result would be ['...list', '...view']
      *
-     * @param string $permission
+     * @param  string  $permission
      * @return string
      */
     public function getImpliedActions(string $action): array
@@ -88,13 +87,12 @@ class Persources
     }
 
     /**
-     * @param string $permission
      * @return string route name
      */
     public function getRouteName(string $permission, string $impliedAction): string
     {
         $hasImpliedActions = in_array($this->getAction($permission), ['read', 'write']);
+
         return $hasImpliedActions ? "$permission|$impliedAction" : $permission;
     }
-
 }
