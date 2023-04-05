@@ -173,7 +173,8 @@ class MakePersourceCommand extends Command
     private function getViewStubPath($filename)
     {
         $path = config('persources.view_stubs_path');
-        return $path ? Str::finish($path, '/') . $filename : $this->getStubPath($filename);
+
+        return $path ? Str::finish($path, '/').$filename : $this->getStubPath($filename);
     }
 
     /**
