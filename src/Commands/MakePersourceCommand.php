@@ -47,7 +47,7 @@ class MakePersourceCommand extends Command
         $singularName = Str::of($model)->afterLast('\\')->toString();
         $pluralName = Str::plural($singularName);
 
-        $permissions = $this->createPermissions($pluralName, $prefix, $actions, !$noMigration);
+        $permissions = $this->createPermissions($pluralName, $prefix, $actions, ! $noMigration);
 
         $allPermissions = array_unique(array_merge($permissions, $existingPermissions));
 
@@ -66,9 +66,9 @@ class MakePersourceCommand extends Command
         $permissionModel = config('permission.models.permission');
         if ($migration) {
             $migrationContent = file_get_contents($this->getStubPath('add_permissions_migration.phpstub'));
-            $migrationContent = str_replace("%USE%", "use $permissionModel;\n", $migrationContent);
-            $migrationUp = "";
-            $migrationDown = "";
+            $migrationContent = str_replace('%USE%', "use $permissionModel;\n", $migrationContent);
+            $migrationUp = '';
+            $migrationDown = '';
         }
         foreach ($actions as $action) {
             if ($action !== 'none') {
@@ -92,9 +92,9 @@ class MakePersourceCommand extends Command
             }
         }
         if ($migration) {
-            $migrationContent = str_replace("%UP%", $migrationUp, $migrationContent);
-            $migrationContent = str_replace("%DOWN%", $migrationDown, $migrationContent);
-            $migrationFilename = Carbon::now()->format("Y_m_d_u") . '_add_' . strtolower($pluralName) . '_permissions.php';
+            $migrationContent = str_replace('%UP%', $migrationUp, $migrationContent);
+            $migrationContent = str_replace('%DOWN%', $migrationDown, $migrationContent);
+            $migrationFilename = Carbon::now()->format('Y_m_d_u').'_add_'.strtolower($pluralName).'_permissions.php';
             file_put_contents(database_path("migrations/$migrationFilename"), $migrationContent);
             $this->info("Created migration $migrationFilename for $pluralName permissions");
         }
