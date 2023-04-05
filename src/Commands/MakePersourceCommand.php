@@ -30,13 +30,13 @@ class MakePersourceCommand extends Command
             $actions = [];
         }
         $existingPermissions = $this->option('permissions');
-        $prefix = $this->option("prefix");
+        $prefix = $this->option('prefix');
 
         $this->info("Generate Resource for Model $model");
 
         $additionalInfo = count($existingPermissions) == 0 ?
             "Be sure to add them to the resource's \$permissions attribute" :
-            "Using exsiting permissions: " . implode(", ", $existingPermissions);
+            'Using exsiting permissions: '.implode(', ', $existingPermissions);
         $this->info(count($actions) == 0 ?
             "Do not generate any permissions. $additionalInfo" :
             'Generate Permissions for actions: '.implode(', ', $actions));
@@ -131,13 +131,13 @@ class MakePersourceCommand extends Command
             $impliedActions = Persources::getImpliedActions($action);
             foreach ($impliedActions as $impliedAction) {
                 $filename = "$impliedAction.blade.php";
-                if (!in_array($filename, $alreadyCreatedViews)) {
+                if (! in_array($filename, $alreadyCreatedViews)) {
                     $source = $this->getStubPath($filename);
                     if (file_exists($source)) {
                         $target = "$targetDir/$filename";
-                        if (!file_exists($target)) {
+                        if (! file_exists($target)) {
                             copy($source, $target);
-                            $this->info('Created view ' . str_replace(base_path(), '', $target));
+                            $this->info('Created view '.str_replace(base_path(), '', $target));
                             $alreadyCreatedViews[] = $filename;
                         } else {
                             $this->warn("View $filename already exists and will not be overwritten");
