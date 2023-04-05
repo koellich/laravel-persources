@@ -31,6 +31,8 @@ to generate the following:
 If a user who visits `https://yourapp/cars` has the permission `cars.list` either directly or indirectly via a role then the `.../cars/list.blade.html` will be rendered. Otherwise, a 403 error will be returned.
 Persources was designed with Livewire in mind, but you can customize everything to suit your preferred front end stack, e.g. Vue.js.
 
+Note that permissions are not created directly in the DB but a migration file is created that will add/remove the permissions. If you do not want a migration, then use the `--noMigration` option.
+
 The package also recognizes permissions ending in 
 `.read` to mean both `list` and `view`, 
 and permissions ending in 

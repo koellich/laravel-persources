@@ -4,6 +4,7 @@ namespace Koellich\Persources\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Koellich\Persources\Facades\Persources;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
@@ -14,7 +15,8 @@ class MakePersourceCommand extends Command
                          {model : The model for which to create a resource and permissions. <fg=green>Car</> or <fg=green>App\\Models\\Car</>} 
                          {actions* : Actions for which to create permissions. Use a combination of: <fg=green>list</>, <fg=green>view</>, <fg=green>read</>, <fg=green>create</>, <fg=green>update</>, <fg=green>update</>, <fg=green>delete</>, or use <fg=green>none</> to avoid creating permissions}
                          {--P|permission=* : Existing permissions to use for this Resource}
-                         {--prefix=} The prefix to use when generating permissions. --prefix=my will create my.cars.read etc.';
+                         {--prefix=} The prefix to use when generating permissions. --prefix=my will create my.cars.read etc.
+                         {--noMigration} If specified, permissions will be created directly in the DB instead of creating a migration';
 
     public $description = 'Create a new Persource';
 
@@ -29,8 +31,9 @@ class MakePersourceCommand extends Command
         if (in_array('none', $actions)) {
             $actions = [];
         }
-        $existingPermissions = $this->option('permissions');
+        $existingPermissions = $this->option('permission');
         $prefix = $this->option('prefix');
+        $noMigration = $this->option('noMigration');
 
         $this->info("Generate Resource for Model $model");
 
@@ -44,7 +47,7 @@ class MakePersourceCommand extends Command
         $singularName = Str::of($model)->afterLast('\\')->toString();
         $pluralName = Str::plural($singularName);
 
-        $permissions = $this->createPermissions($pluralName, $prefix, $actions);
+        $permissions = $this->createPermissions($pluralName, $prefix, $actions, !$noMigration);
 
         $allPermissions = array_unique(array_merge($permissions, $existingPermissions));
 
@@ -57,10 +60,16 @@ class MakePersourceCommand extends Command
         return self::SUCCESS;
     }
 
-    private function createPermissions($pluralName, $prefix, array $actions): array
+    private function createPermissions($pluralName, $prefix, array $actions, $migration): array
     {
         $permissions = [];
         $permissionModel = config('permission.models.permission');
+        if ($migration) {
+            $migrationContent = file_get_contents($this->getStubPath('add_permissions_migration.phpstub'));
+            $migrationContent = str_replace("%USE%", "use $permissionModel;\n", $migrationContent);
+            $migrationUp = "";
+            $migrationDown = "";
+        }
         foreach ($actions as $action) {
             if ($action !== 'none') {
                 if (! in_array($action, ['list', 'view', 'read', 'create', 'update', 'write', 'delete'])) {
@@ -69,15 +78,25 @@ class MakePersourceCommand extends Command
                     $permission = $prefix ? strtolower("$prefix.$pluralName.$action") : strtolower("$pluralName.$action");
                     $permissions[] = $permission;
                     try {
-                        $permissionModel::create([
-                            'name' => $permission,
-                        ]);
-                        $this->info("Created $permissionModel for $permission");
+                        if ($migration) {
+                            $migrationUp .= "        $permissionModel::create(['name' => '$permission']);\n";
+                            $migrationDown .= "        $permissionModel::where('name', '=', '$permission')->delete();\n";
+                        } else {
+                            $permissionModel::create(['name' => $permission]);
+                            $this->info("Created $permissionModel for $permission");
+                        }
                     } catch (PermissionAlreadyExists) {
                         $this->warn("$permissionModel for $permission already exists and will not be overwritten.");
                     }
                 }
             }
+        }
+        if ($migration) {
+            $migrationContent = str_replace("%UP%", $migrationUp, $migrationContent);
+            $migrationContent = str_replace("%DOWN%", $migrationDown, $migrationContent);
+            $migrationFilename = Carbon::now()->format("Y_m_d_u") . '_add_' . strtolower($pluralName) . '_permissions.php';
+            file_put_contents(database_path("migrations/$migrationFilename"), $migrationContent);
+            $this->info("Created migration $migrationFilename for $pluralName permissions");
         }
 
         return $permissions;
