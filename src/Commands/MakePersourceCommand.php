@@ -151,7 +151,7 @@ class MakePersourceCommand extends Command
             foreach ($impliedActions as $impliedAction) {
                 $filename = "$impliedAction.blade.php";
                 if (! in_array($filename, $alreadyCreatedViews)) {
-                    $source = $this->getStubPath($filename);
+                    $source = $this->getViewStubPath($filename);
                     if (file_exists($source)) {
                         $target = "$targetDir/$filename";
                         if (! file_exists($target)) {
@@ -165,6 +165,15 @@ class MakePersourceCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function getViewStubPath($filename)
+    {
+        $path = config('persources.view_stubs_path');
+        return $path ? Str::finish($path, '/') . $filename : $this->getStubPath($filename);
     }
 
     /**

@@ -29,9 +29,10 @@ to generate the following:
 | cars.delete | DELETE /cars/{id} |                                           |
 
 If a user who visits `https://yourapp/cars` has the permission `cars.list` either directly or indirectly via a role then the `.../cars/list.blade.html` will be rendered. Otherwise, a 403 error will be returned.
-Persources was designed with Livewire in mind, but you can customize everything to suit your preferred front end stack, e.g. Vue.js.
 
 Note that permissions are not created directly in the DB but a migration file is created that will add/remove the permissions. If you do not want a migration, then use the `--noMigration` option.
+
+Views are generated from stubs. You can override the stubs directory and use your own stubs by setting the config variable `view_stubs_path`.
 
 The package also recognizes permissions ending in 
 `.read` to mean both `list` and `view`, 
@@ -119,6 +120,21 @@ return [
 
     'view_root' => env('PERSOURCES_VIEWS_ROOT', 'views/persources'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | View Stubs Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the path under which the view template stubs are located.
+    | If null, then the stubs from the persources package will be used.
+    |
+    | Set this to e.g.: base_path('stubs') and make sure the following
+    | files exist there: list.blade.php, view.blade.php
+    |
+    */
+
+    'view_stubs_path' => env('PERSOURCES_VIEW_STUBS', null),
+    
     /*
     |--------------------------------------------------------------------------
     | Middleware Group

@@ -35,7 +35,22 @@ return [
     |
     */
 
-    'view_root' => env('PERSOURCES_VIEWS_ROOT', 'views/persources'),
+    'view_root' => env('PERSOURCES_VIEW_ROOT', 'views/persources'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | View Stubs Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the path under which the view template stubs are located.
+    | If null, then the stubs from the persources package will be used.
+    |
+    | Set this to e.g.: base_path('stubs') and make sure the following
+    | files exist there: list.blade.php, view.blade.php
+    |
+    */
+
+    'view_stubs_path' => env('PERSOURCES_VIEW_STUBS', null),
 
     /*
     |--------------------------------------------------------------------------
