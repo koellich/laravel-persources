@@ -10,7 +10,7 @@ laravel-persources expands on [spatie/laravel-permission](https://spatie.be/docs
 
 ## How to use
 
-Let's say you have a model called ```Car``` that you want to expose in your frontend:
+Let's say you have a model called `Car` that you want to expose in your frontend:
 
 ```bash
 php artisan make:persource Car list view create update delete
@@ -49,10 +49,19 @@ Routes are generated at runtime. This means you will only have those routes that
 
 In this case, run:
 ```bash
-php artisan make:persource Car none
+php artisan make:persource Car none -Pmy.cars.read -Pmy.cars.update
 ```
 
-and then paste your existing permissions into the resource's `$permissions` attribute.
+Here, `my.cars.read` and `my.cars.update` are the existing permissions. Multiple permissions are possible.
+Note: You can always add existing permissions to the resource's `$permissions` attribute.
+
+**Prefixing permissions**
+
+If you want to prefix generated permissions, you can use the ´--prefix´ option:
+```
+php artisan make:persource User read write --prefix=admin
+```
+This will generate the permissions: `admin.users.read` and `admin.users.write` as well as the corresponding routes under `admin/users/`.
 
 ## Installation
 
@@ -65,13 +74,71 @@ composer require koellich/laravel-persources
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-persources-config"
+php artisan vendor:publish --tag="persources-config"
 ```
 
 This is the contents of the published config file:
 
 ```php
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Namespace
+    |--------------------------------------------------------------------------
+    |
+    | This is the namespace under which the Resources are generated.
+    |
+    */
+
+    'resources_namespace' => env('PERSOURCES_RESOURCES_NAMESPACE', 'App\\Persources'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Root Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the root path under which all persources routes will be generated.
+    | Change this to avoid collisions with your other routes.
+    |
+    */
+
+    'route_root' => env('PERSOURCES_ROOT', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | View Root Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the path under which the view templates are generated in the
+    | resources path.
+    |
+    */
+
+    'view_root' => env('PERSOURCES_VIEWS_ROOT', 'views/persources'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware Group
+    |--------------------------------------------------------------------------
+    |
+    | This is the middleware group that is used for the generated routes
+    |
+    */
+
+    'middleware_group' => env('PERSOURCES_MIDDLEWARE_GROUP', 'web'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Role
+    |--------------------------------------------------------------------------
+    |
+    | This is the Role which can access all resources regardless of permissions.
+    | Set this to null if you do not want to have an admin role.
+    |
+    */
+
+    'admin_role' => env('PERSOURCES_ADMIN_PERMISSION', 'admin'),
 ];
 ```
 

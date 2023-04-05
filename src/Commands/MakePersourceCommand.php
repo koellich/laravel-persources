@@ -12,7 +12,9 @@ class MakePersourceCommand extends Command
 {
     public $signature = 'make:persource 
                          {model : The model for which to create a resource and permissions. <fg=green>Car</> or <fg=green>App\\Models\\Car</>} 
-                         {actions* : Actions for which to create permissions. Use a combination of the following: <fg=green>list</>, <fg=green>view</>, <fg=green>read</>, <fg=green>create</>, <fg=green>update</>, <fg=green>update</>, <fg=green>delete</>, or use <fg=green>none</> to avoid creating permissions }';
+                         {actions* : Actions for which to create permissions. Use a combination of: <fg=green>list</>, <fg=green>view</>, <fg=green>read</>, <fg=green>create</>, <fg=green>update</>, <fg=green>update</>, <fg=green>delete</>, or use <fg=green>none</> to avoid creating permissions}
+                         {--P|permission=* : Existing permissions to use for this Resource}
+                         {--prefix=} The prefix to use when generating permissions. --prefix=my will create my.cars.read etc.';
 
     public $description = 'Create a new Persource';
 
@@ -27,27 +29,35 @@ class MakePersourceCommand extends Command
         if (in_array('none', $actions)) {
             $actions = [];
         }
+        $existingPermissions = $this->option('permissions');
+        $prefix = $this->option("prefix");
 
         $this->info("Generate Resource for Model $model");
+
+        $additionalInfo = count($existingPermissions) == 0 ?
+            "Be sure to add them to the resource's \$permissions attribute" :
+            "Using exsiting permissions: " . implode(", ", $existingPermissions);
         $this->info(count($actions) == 0 ?
-            "Do not generate any permissions. Be sure to add them to the resource's \$permissions attribute" :
+            "Do not generate any permissions. $additionalInfo" :
             'Generate Permissions for actions: '.implode(', ', $actions));
 
         $singularName = Str::of($model)->afterLast('\\')->toString();
         $pluralName = Str::plural($singularName);
 
-        $permissions = $this->createPermissions($pluralName, $actions);
+        $permissions = $this->createPermissions($pluralName, $prefix, $actions);
 
-        $this->generateResource($model, $singularName, $pluralName, $permissions, $actions);
+        $allPermissions = array_unique(array_merge($permissions, $existingPermissions));
 
-        $this->copyViews($pluralName, $permissions);
+        $this->generateResource($model, $singularName, $pluralName, $allPermissions, $actions);
+
+        $this->copyViews($pluralName, $allPermissions);
 
         $this->info('All done');
 
         return self::SUCCESS;
     }
 
-    private function createPermissions($pluralName, array $actions): array
+    private function createPermissions($pluralName, $prefix, array $actions): array
     {
         $permissions = [];
         $permissionModel = config('permission.models.permission');
@@ -56,7 +66,7 @@ class MakePersourceCommand extends Command
                 if (! in_array($action, ['list', 'view', 'read', 'create', 'update', 'write', 'delete'])) {
                     $this->warn("Unknown action $action");
                 } else {
-                    $permission = strtolower("$pluralName.$action");
+                    $permission = $prefix ? strtolower("$prefix.$pluralName.$action") : strtolower("$pluralName.$action");
                     $permissions[] = $permission;
                     try {
                         $permissionModel::create([
@@ -115,19 +125,23 @@ class MakePersourceCommand extends Command
     {
         $targetDir = Persources::getViewsPath().'/'.strtolower($pluralName);
         $this->ensureDir($targetDir);
+        $alreadyCreatedViews = [];
         foreach ($permissions as $permission) {
             $action = Persources::getAction($permission);
             $impliedActions = Persources::getImpliedActions($action);
             foreach ($impliedActions as $impliedAction) {
                 $filename = "$impliedAction.blade.php";
-                $source = $this->getStubPath($filename);
-                if (file_exists($source)) {
-                    $target = "$targetDir/$filename";
-                    if (! file_exists($target)) {
-                        copy($source, $target);
-                        $this->info('Created view '.str_replace(base_path(), '', $target));
-                    } else {
-                        $this->warn("View $filename already exists and will not be overwritten");
+                if (!in_array($filename, $alreadyCreatedViews)) {
+                    $source = $this->getStubPath($filename);
+                    if (file_exists($source)) {
+                        $target = "$targetDir/$filename";
+                        if (!file_exists($target)) {
+                            copy($source, $target);
+                            $this->info('Created view ' . str_replace(base_path(), '', $target));
+                            $alreadyCreatedViews[] = $filename;
+                        } else {
+                            $this->warn("View $filename already exists and will not be overwritten");
+                        }
                     }
                 }
             }
