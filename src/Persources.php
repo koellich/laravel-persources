@@ -28,7 +28,7 @@ class Persources
                 $resource = new $class();
                 foreach ($resource->getPermissions() as $permission) {
                     App::singleton($permission, $class);
-                    App::singleton("Resource".$resource->model, $class);
+                    App::singleton('Resource'.$resource->model, $class);
                 }
                 $this->resources[] = $resource;
             }
@@ -54,8 +54,6 @@ class Persources
 
     /**
      * Returns the Resource responsible for a given model class (as defined in Resource->model)
-     * @param $model
-     * @return Resource|null
      */
     public function getResourceForModel($model): ?Resource
     {
