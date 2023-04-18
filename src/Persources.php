@@ -28,7 +28,7 @@ class Persources
                 $resource = new $class();
                 foreach ($resource->getPermissions() as $permission) {
                     App::singleton("Persources.$permission", $class);
-                    App::singleton('Persources.' . $resource->name, $class);
+                    App::singleton('Persources.'.$resource->name, $class);
                 }
                 $this->resources[] = $resource;
             }
@@ -54,8 +54,8 @@ class Persources
 
     /**
      * Returns the Resource by the given $name
+     *
      * @param $name string The Resource's name
-     * @return Resource|null
      */
     public function getResourceByName(string $name): ?Resource
     {

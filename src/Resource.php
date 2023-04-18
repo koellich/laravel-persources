@@ -74,18 +74,16 @@ class Resource
      * Append the $query such that a search is performed using the given $search string.
      * The default implementation does nothing. Subclasses can override this to implement search.
      *
-     * @param $query
-     * @param string $search
      * @return mixed Return the modified $query
      */
-    public function addSearchClause($query, string $search) {
+    public function addSearchClause($query, string $search)
+    {
         return $query;
     }
 
     /**
      * Creates a new model
      *
-     * @param Request $request
      * @return \Illuminate\Http\Response|never
      */
     public function create(Request $request)
@@ -98,8 +96,6 @@ class Resource
     /**
      * Updates the model with the given $id if it is in the query()'s result set.
      *
-     * @param Request $request
-     * @param $id
      * @return \Illuminate\Http\Response|never
      */
     public function update(Request $request, $id)
@@ -112,7 +108,6 @@ class Resource
     /**
      * Deletes the model with the given $id if it is in the query()'s result set.
      *
-     * @param $id
      * @return \Illuminate\Http\Response|never
      */
     public function delete($id)
@@ -124,7 +119,6 @@ class Resource
 
     /**
      * Returns the item count using the query()
-     * @return int
      */
     public function getItemCount(): int
     {
@@ -135,13 +129,13 @@ class Resource
      * Returns a list of models using the query().
      * Result is a collection of dicts containing only $listItemAttributes
      *
-     * @param int $offset The first result of the query
-     * @param ?int $count The number of items to return. If null, then all items are returned.
-     * @param string $search search term (optional). If present, the addSearchClause($query) function will be called.
-     * @param string $orderBy column to order by. Or null to omit order by clause
-     * @param string $orderDirection ASC or DESC. Default: ASC
+     * @param  int  $offset The first result of the query
+     * @param  ?int  $count The number of items to return. If null, then all items are returned.
+     * @param  string  $search search term (optional). If present, the addSearchClause($query) function will be called.
+     * @param  string  $orderBy column to order by. Or null to omit order by clause
+     * @param  string  $orderDirection ASC or DESC. Default: ASC
      */
-    public function getItems(int $offset = 0, ?int $count = null, ?string $search = null, ?string $orderBy = null, string $orderDirection = "ASC")
+    public function getItems(int $offset = 0, ?int $count = null, ?string $search = null, ?string $orderBy = null, string $orderDirection = 'ASC')
     {
         $query = $this->query();
         if ($count) {
@@ -153,14 +147,12 @@ class Resource
         if ($search) {
             $query = $this->addSearchClause($query, $search);
         }
+
         return $query->get()->map->only($this->listItemAttributes);
     }
 
     /**
      * Using the query(), getItem($id) returns the model with the given $id as a dict containing only $singleItemAttributes
-     *
-     * @param $id
-     * @return array
      */
     public function getItem($id): array
     {
@@ -188,7 +180,7 @@ class Resource
             foreach ($impliedActions as $impliedAction) {
                 foreach ($this->permissions as $permission) {
                     $alreadyAdded = Arr::first($userActions, fn ($userAction) => $userAction['name'] == $impliedAction) != null;
-                    if (!$alreadyAdded) {
+                    if (! $alreadyAdded) {
                         $permissionImpliesAction = in_array($impliedAction,
                             Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission)));
                         $currentUserHasPermission = Facades\Persources::checkPermission($permission);
