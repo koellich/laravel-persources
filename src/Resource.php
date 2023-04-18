@@ -120,7 +120,7 @@ class Resource
     /**
      * Returns the item count using the query()
      *
-     * @param string $search Search term (optional)
+     * @param  string  $search Search term (optional)
      */
     public function getItemCount(?string $search = null): int
     {
@@ -128,6 +128,7 @@ class Resource
         if ($search) {
             $query = $this->addSearchClause($query, $search);
         }
+
         return $query->count();
     }
 
