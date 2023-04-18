@@ -7,6 +7,11 @@ use Koellich\Persources\Resource;
 class %RESOURCE% extends Resource
 {
     /**
+     * @var string Unique name of this resource. Can be used in Persources::getResourceByName($name)
+     */
+    public string $name = '%RESOURCE%';
+
+    /**
      * @var string Full qualified name of the Model that this resource represents.
      */
     public string $model = %MODEL%;
@@ -41,4 +46,14 @@ class %RESOURCE% extends Resource
      */
     public array $actions = %ACTIONS%;
 
+    /**
+     * Append the $query such that a search is performed using the given $search string.
+     *
+     * @param $query
+     * @param string $search
+     * @return mixed Return the modified $query
+     */
+    public function addSearchClause($query, string $search) {
+        return $query;
+    }
 }

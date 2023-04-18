@@ -8,7 +8,7 @@ use Koellich\Persources\Resource;
 /**
  * @method static bool checkPermission(string $permission)
  * @method static Resource|null getResourceForPermission(string $permission)
- * @method static Resource|null getResourceForModel(string $model)
+ * @method static Resource|null getResourceByName(string $name)
  * @method static array getResources()
  * @method static void registerResources()
  * @method static string getResourcesPath()

@@ -27,8 +27,8 @@ class Persources
                 $class = config('persources.resources_namespace').'\\'.basename($file, '.php');
                 $resource = new $class();
                 foreach ($resource->getPermissions() as $permission) {
-                    App::singleton($permission, $class);
-                    App::singleton("Resource".$resource->model, $class);
+                    App::singleton("Persources.$permission", $class);
+                    App::singleton('Persources.' . $resource->name, $class);
                 }
                 $this->resources[] = $resource;
             }
@@ -47,19 +47,19 @@ class Persources
      *
      * @return resource
      */
-    public function getResourceForPermission($permission): ?Resource
+    public function getResourceForPermission(string $permission): ?Resource
     {
-        return App::make($permission);
+        return App::make("Persources.$permission");
     }
 
     /**
-     * Returns the Resource responsible for a given model class (as defined in Resource->model)
-     * @param $model
+     * Returns the Resource by the given $name
+     * @param $name string The Resource's name
      * @return Resource|null
      */
-    public function getResourceForModel($model): ?Resource
+    public function getResourceByName(string $name): ?Resource
     {
-        return App::make("Resource$model");
+        return App::make("Persources.$name");
     }
 
     public function getResourcesPath(): string

@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Response;
 class Resource
 {
     /**
+     * @var string Unique name of this resource. Can be used in Persources::getResourceByName($name)
+     */
+    public string $name;
+
+    /**
      * @var string Full qualified name of the Model that this resource represents.
      */
     public string $model;
@@ -66,6 +71,18 @@ class Resource
     }
 
     /**
+     * Append the $query such that a search is performed using the given $search string.
+     * The default implementation does nothing. Subclasses can override this to implement search.
+     *
+     * @param $query
+     * @param string $search
+     * @return mixed Return the modified $query
+     */
+    public function addSearchClause($query, string $search) {
+        return $query;
+    }
+
+    /**
      * Creates a new model
      *
      * @param Request $request
@@ -120,10 +137,11 @@ class Resource
      *
      * @param int $offset The first result of the query
      * @param ?int $count The number of items to return. If null, then all items are returned.
+     * @param string $search search term (optional). If present, the addSearchClause($query) function will be called.
      * @param string $orderBy column to order by. Or null to omit order by clause
      * @param string $orderDirection ASC or DESC. Default: ASC
      */
-    public function getItems(int $offset = 0, ?int $count = null, ?string $orderBy = null, string $orderDirection = "ASC")
+    public function getItems(int $offset = 0, ?int $count = null, ?string $search = null, ?string $orderBy = null, string $orderDirection = "ASC")
     {
         $query = $this->query();
         if ($count) {
@@ -131,6 +149,9 @@ class Resource
         }
         if ($orderBy) {
             $query = $query->orderBy($orderBy, $orderDirection);
+        }
+        if ($search) {
+            $query = $this->addSearchClause($query, $search);
         }
         return $query->get()->map->only($this->listItemAttributes);
     }
