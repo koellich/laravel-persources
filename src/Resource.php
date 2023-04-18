@@ -3,7 +3,7 @@
 namespace Koellich\Persources;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
 
 class Resource
@@ -43,16 +43,34 @@ class Resource
      */
     public array $actions = [];
 
-    public function list(Request $request)
+    public function list()
     {
-        return view($this->getView('list'), ['resource' => $this, 'items' => $this->getItems($request)]);
+        return view($this->getView('list'), ['resource' => $this]);
     }
 
-    public function view(Request $request, $id)
+    public function view($id)
     {
-        return view($this->getView('view'), ['resource' => $this, 'item' => $this->getItem($request, $id)]);
+        return view($this->getView('view'), ['resource' => $this, 'item' => $this->getItem($id)]);
     }
 
+    /**
+     * Returns the query to be used for fetching the models, either for list or single items.
+     * Override this to customize.
+     * Defaults to all items, i.e.: $this->getModelClassName()::query()
+     *
+     * @return void
+     */
+    public function query()
+    {
+        return $this->getModelClassName()::query();
+    }
+
+    /**
+     * Creates a new model
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response|never
+     */
     public function create(Request $request)
     {
         $ok = $this->getModelClassName()::create($request->all());
@@ -60,39 +78,72 @@ class Resource
         return $ok ? Response::noContent() : abort(400);
     }
 
+    /**
+     * Updates the model with the given $id if it is in the query()'s result set.
+     *
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\Response|never
+     */
     public function update(Request $request, $id)
     {
-        $ok = $this->getModelClassName()::find($id)->update($request->all());
-
-        return $ok ? Response::noContent() : abort(400);
-    }
-
-    public function delete(Request $request, $id)
-    {
-        $ok = $this->getModelClassName()::find($id)->delete();
+        $ok = $this->query()->find($id)->update($request->all());
 
         return $ok ? Response::noContent() : abort(400);
     }
 
     /**
-     * Returns all permissions that are handled by this resource.
+     * Deletes the model with the given $id if it is in the query()'s result set.
+     *
+     * @param $id
+     * @return \Illuminate\Http\Response|never
      */
-    public function getPermissions(): array
+    public function delete($id)
     {
-        return $this->permissions;
+        $ok = $this->query()->find($id)->delete();
+
+        return $ok ? Response::noContent() : abort(400);
     }
 
     /**
-     * Returns a list of all Models that fit the request
+     * Returns the item count using the query()
+     * @return int
      */
-    public function getItems(Request $request): Collection
+    public function getItemCount(): int
     {
-        return $this->getModelClassName()::all()->map->only($this->listItemAttributes);
+        return $this->query()->count();
     }
 
-    public function getItem(Request $request, $id): array
+    /**
+     * Returns a list of models using the query().
+     * Result is a collection of dicts containing only $listItemAttributes
+     *
+     * @param int $offset The first result of the query
+     * @param ?int $count The number of items to return. If null, then all items are returned.
+     * @param string $orderBy column to order by. Or null to omit order by clause
+     * @param string $orderDirection ASC or DESC. Default: ASC
+     */
+    public function getItems(int $offset = 0, ?int $count = null, ?string $orderBy = null, string $orderDirection = "ASC")
     {
-        return $this->getModelClassName()::find($id)->only($this->singleItemAttributes);
+        $query = $this->query();
+        if ($count) {
+            $query = $query->take($count)->skip($offset);
+        }
+        if ($orderBy) {
+            $query = $query->orderBy($orderBy, $orderDirection);
+        }
+        return $query->get()->map->only($this->listItemAttributes);
+    }
+
+    /**
+     * Using the query(), getItem($id) returns the model with the given $id as a dict containing only $singleItemAttributes
+     *
+     * @param $id
+     * @return array
+     */
+    public function getItem($id): array
+    {
+        return $this->query()->find($id)->only($this->singleItemAttributes);
     }
 
     public function getView(string $action)
@@ -102,24 +153,28 @@ class Resource
         return implode('.', [$root, strtolower($this->pluralName), $action]);
     }
 
-    public function getHttpMethod(string $action)
-    {
-        return Facades\Persources::getHttpMethod($action);
-    }
-
     /**
      * From all $actions supported by this Resource, this method returns only the ones that the user may perform
      * according to his permissions.
+     *
+     * @return array [['name' => 'edit', 'method' => 'PATCH'], ...]
      */
     public function getActionsForCurrentUser(): array
     {
         $userActions = [];
         foreach ($this->actions as $action) {
-            foreach ($this->permissions as $permission) {
-                if (! in_array($action, $userActions) &&
-                    in_array($action, Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission))) &&
-                    Facades\Persources::checkPermission($permission)) {
-                    $userActions[] = $action;
+            $impliedActions = Facades\Persources::getImpliedActions($action);
+            foreach ($impliedActions as $impliedAction) {
+                foreach ($this->permissions as $permission) {
+                    $alreadyAdded = Arr::first($userActions, fn ($userAction) => $userAction['name'] == $impliedAction) != null;
+                    if (!$alreadyAdded) {
+                        $permissionImpliesAction = in_array($impliedAction,
+                            Facades\Persources::getImpliedActions(Facades\Persources::getAction($permission)));
+                        $currentUserHasPermission = Facades\Persources::checkPermission($permission);
+                        if ($permissionImpliesAction && $currentUserHasPermission) {
+                            $userActions[] = ['name' => $impliedAction, 'method' => Facades\Persources::getHttpMethod($impliedAction)];
+                        }
+                    }
                 }
             }
         }
@@ -133,5 +188,13 @@ class Resource
     public function getModelClassName(): string
     {
         return '\\'.$this->model;
+    }
+
+    /**
+     * Returns all permissions that are handled by this resource.
+     */
+    public function getPermissions(): array
+    {
+        return $this->permissions;
     }
 }

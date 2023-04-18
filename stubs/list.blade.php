@@ -17,7 +17,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($items as $item)
+                @foreach($resource->getItems() as $item)
                 <tr>
                     @foreach($resource->listItemAttributes as $lia)
                     <td>{{ $item[$lia] }}</td>

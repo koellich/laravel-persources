@@ -23,7 +23,7 @@ class PersourcesController extends Controller
             abort(403, __('persources::translations.403_no_permission', ['permission' => $permission]));
         }
 
-        $resource = Persources::getResourceFor($permission);
+        $resource = Persources::getResourceForPermission($permission);
         if (! $resource) {
             abort(500, __('persources::translations.500_no_resource', ['permission' => $permission]));
         }
