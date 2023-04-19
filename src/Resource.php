@@ -58,7 +58,7 @@ class Resource
     /**
      * Returns all columns of the Resource's $model that are not $hidden
      */
-    private function getPublicModelColumns(): array
+    public function getPublicModelColumns(): array
     {
         $model = new ($this->getModelClassName())();
         $columns = Schema::getColumnListing($model->getTable());

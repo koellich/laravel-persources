@@ -128,8 +128,6 @@ class MakePersourceCommand extends Command
                 '%SINGULAR_NAME%' => "'$singularName'",
                 '%PLURAL_NAME%' => "'$pluralName'",
                 '%PERMISSIONS%' => $this->formatArray($permissions),
-                '%LISTITEM_ATTRIBUTES%' => "['id']",
-                '%SINGLEITEM_ATTRIBUTES%' => "['id']",
                 '%ACTIONS%' => $this->formatArray($availableActions)] as $placeholder => $value) {
                 $res = str_replace($placeholder, $value, $res);
             }
