@@ -35,12 +35,12 @@ class Resource
     public array $permissions = [];
 
     /**
-     * @var array Array of model attributes that can be used when displaying a list of models. Defaults to all columns that are not $hidden.
+     * @var array Array of model attributes that can be used when displaying a list of models. Defaults to all columns that are not.
      */
     public array $listItemAttributes;
 
     /**
-     * @var array Array of model attributes that can be used when displaying a single model. Defaults to all columns that are not $hidden.
+     * @var array Array of model attributes that can be used when displaying a single model. Defaults to all columns that are not.
      */
     public array $singleItemAttributes;
 
@@ -57,12 +57,12 @@ class Resource
 
     /**
      * Returns all columns of the Resource's $model that are not $hidden
-     * @return array
      */
     private function getPublicModelColumns(): array
     {
         $model = new ($this->getModelClassName())();
         $columns = Schema::getColumnListing($model->getTable());
+
         return array_diff($columns, $model->getHidden());
     }
 
