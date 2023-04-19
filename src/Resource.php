@@ -5,6 +5,7 @@ namespace Koellich\Persources;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Schema;
 
 class Resource
 {
@@ -34,19 +35,36 @@ class Resource
     public array $permissions = [];
 
     /**
-     * @var array Array of model attributes that can be used when displaying a list of models.
+     * @var array Array of model attributes that can be used when displaying a list of models. Defaults to all columns that are not $hidden.
      */
-    public array $listItemAttributes = [];
+    public array $listItemAttributes;
 
     /**
-     * @var array Array of model attributes that can be used when displaying a single model.
+     * @var array Array of model attributes that can be used when displaying a single model. Defaults to all columns that are not $hidden.
      */
-    public array $singleItemAttributes = [];
+    public array $singleItemAttributes;
 
     /**
      * @var array Array of actions that are available.
      */
     public array $actions = [];
+
+    public function __construct()
+    {
+        $this->listItemAttributes = $this->getPublicModelColumns();
+        $this->singleItemAttributes = $this->listItemAttributes;
+    }
+
+    /**
+     * Returns all columns of the Resource's $model that are not $hidden
+     * @return array
+     */
+    private function getPublicModelColumns(): array
+    {
+        $model = new ($this->getModelClassName())();
+        $columns = Schema::getColumnListing($model->getTable());
+        return array_diff($columns, $model->getHidden());
+    }
 
     public function list()
     {
