@@ -38,8 +38,11 @@ class %RESOURCE% extends Resource
 
     public function __construct()
     {
-        $this->listItemAttributes = $this->getPublicModelColumns();
-        $this->singleItemAttributes = $this->listItemAttributes;
+        parent::__construct();
+        // remove columns that should not be displayed:
+        $removeColumns = ['created_at', 'updated_at'];
+        $this->listItemAttributes = array_diff($this->listItemAttributes, $removeColumns);
+        $this->singleItemAttributes = array_diff($this->singleItemAttributes, $removeColumns);
     }
 
     /**
