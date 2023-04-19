@@ -17,6 +17,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed getItems(int $offset = 0, ?int $count = null, ?string $orderBy = null, string $orderDirection = "ASC")
  * @method static array getItem($id)
  * @method static array getActionsForCurrentUser()
+ * @method static string translatedModelName()
+ * @method static string translatedModelNamePlural()
+ * @method static array getPublicModelColumns()
  *
  * @see \Koellich\Persources\Resource
  */

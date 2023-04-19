@@ -235,4 +235,18 @@ class Resource
     {
         return $this->permissions;
     }
+
+    /**
+     * @return string The translated model name as defined by the key resources.<singularName>
+     */
+    public function translatedModelName(): string {
+        return __('resources.' . strtolower($this->singularName));
+    }
+
+    /**
+     * @return string The translated model name as defined by the key resources.<singularName>
+     */
+    public function translatedModelNamePlural(): string {
+        return __('resources.' . strtolower($this->pluralName));
+    }
 }
