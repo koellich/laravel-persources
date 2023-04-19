@@ -61,7 +61,7 @@ class Resource
     public function getPublicModelColumns(): array
     {
         $model = new ($this->getModelClassName())();
-        $columns = Schema::getColumnListing($model->getTable());
+        $columns = Schema::connection($model->getConnectionName())->getColumnListing($model->getTable());
 
         return array_diff($columns, $model->getHidden());
     }
