@@ -5,6 +5,7 @@ namespace Koellich\Persources\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Koellich\Persources\Facades\Persources;
 use Spatie\Permission\Exceptions\PermissionAlreadyExists;
@@ -128,7 +129,8 @@ class MakePersourceCommand extends Command
                 '%SINGULAR_NAME%' => "'$singularName'",
                 '%PLURAL_NAME%' => "'$pluralName'",
                 '%PERMISSIONS%' => $this->formatArray($permissions),
-                '%ACTIONS%' => $this->formatArray($availableActions)] as $placeholder => $value) {
+                '%ACTIONS%' => $this->formatArray($availableActions),
+                '%COLUMN_DEFS%' => $this->getColumnDefs($model)] as $placeholder => $value) {
                 $res = str_replace($placeholder, $value, $res);
             }
             file_put_contents($resourceFilename, $res);
@@ -136,6 +138,42 @@ class MakePersourceCommand extends Command
         } else {
             $this->warn("$resourceFQN already exists and will not be overwritten.");
         }
+    }
+
+    /**
+     * @param $model
+     * @return string default column definitions based on the model's DB table's columns minus the $hidden columns
+     */
+    private function getColumnDefs($model)
+    {
+        $columnDefs = "[\n";
+
+        $fqModel = "\\$model";
+        $instance = new $fqModel();
+        $schema = Schema::connection($instance->getConnectionName());
+        $table = $instance->getTable();
+        $columns = $schema->getColumnListing($table);
+        $columns = array_diff($columns, $instance->getHidden());
+
+        foreach ($columns as $column) {
+            $showInList = in_array($column, ['id', 'name', 'email']) ? 'true' : 'false';
+            $showOnSingleItem = 'true';
+            $readonly = in_array($column, ['id', 'created_at', 'updated_at']) ? 'true' : 'false';
+            $dbType = $schema->getColumnType($table, $column);
+            $htmlType = match ($dbType) {
+                'tinyint(1)', 'bit', 'boolean' => 'checkbox',
+                'string' => str_contains('email', $column) ? 'email' : 'text',
+                default => 'text'
+            };
+            $pattern = match($dbType) {
+                'tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'integer'  => ", 'pattern' => '[0-9]+'",
+                'decimal', 'number', 'float', 'double' => ", 'pattern' => '[0-9.,]+'",
+                default => ''
+            };
+            $columnDefs .= "            ['name' => '$column', 'dbType' => '$dbType', 'label' => __('resources.$column'), 'showInList' => $showInList, 'showOnSingleItem' => $showOnSingleItem, 'readonly' => $readonly, 'htmlType' => '$htmlType'$pattern],\n";
+        }
+
+        return $columnDefs . "        ]";
     }
 
     private function copyViews(string $pluralName, array $permissions)

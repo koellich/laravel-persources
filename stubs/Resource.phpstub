@@ -36,23 +36,61 @@ class %RESOURCE% extends Resource
      */
     public array $actions = %ACTIONS%;
 
-    public function __construct()
+    /**
+     * Column Definitions
+     *
+     * Available keys are:
+     *
+     * name: string - name of DB column
+     * dbType: string - type of the column in the DB; null for transient columns
+     * label: string - human readable name
+     * showInList: boolean - show this column in a list view?
+     * showOnSingleItem: boolean - show this column in a single item view?
+     * readonly: boolean - should this column be presented read-only?
+     * htmlType: select, radiogroup, checkboxgroup or https://www.w3schools.com/html/html_form_input_types.asp
+     * choices: array(value => label) - map of choices for type select, radiogroup of checkboxgroup
+     * placeholder: string - placeholder for html input element
+     * required: boolean - make html input element required?
+     * class: string - class attribute on html input element
+     * pattern: string - pattern attribute on the html input element
+     *
+     * @var array Array of Column Definitions
+     */
+    public function columnDefinitions(): array
     {
-        parent::__construct();
-        // remove columns that should not be displayed:
-        $removeColumns = ['created_at', 'updated_at'];
-        $this->listItemAttributes = array_diff($this->listItemAttributes, $removeColumns);
-        $this->singleItemAttributes = array_diff($this->singleItemAttributes, $removeColumns);
+        return %COLUMN_DEFS%;
+    }
+
+    /**
+     * Export Configs
+     *
+     * Available keys are:
+     *
+     * name: string
+     * query: fn ($query) => $query->doSomethingWithIt(...)
+     *
+     * Note that the $query passed to the query-fn is just the base query without sorting or searching.
+     * You can use addSearchClause($query, $search) to add the search clause in case you need it.
+     *
+     * @param ?string $search Search String
+     * @returns array Array of Export Configs
+     */
+    public function exportDefinitions(?string $search = null): array
+    {
+        return [
+            ["name" => __("resources.export_default"), "query" => fn ($query) => $query],
+        ];
     }
 
     /**
      * Append the $query such that a search is performed using the given $search string.
+     * The default implementation does nothing. Subclasses can override this to implement search.
      *
-     * @param $query
-     * @param string $search
+     * @param ?string $search
      * @return mixed Return the modified $query
      */
-    public function addSearchClause($query, string $search) {
+    public function addSearchClause($query, ?string $search)
+    {
         return $query;
     }
 }

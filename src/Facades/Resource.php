@@ -19,7 +19,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getActionsForCurrentUser()
  * @method static string translatedModelName()
  * @method static string translatedModelNamePlural()
- * @method static array getPublicModelColumns()
+ * @method static array columnDefinitions()
+ * @method static array exportDefinitions()
  *
  * @see \Koellich\Persources\Resource
  */

@@ -5,7 +5,6 @@ namespace Koellich\Persources;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Schema;
 
 class Resource
 {
@@ -35,35 +34,66 @@ class Resource
     public array $permissions = [];
 
     /**
-     * @var array Array of model attributes that can be used when displaying a list of models. Defaults to all columns that are not.
-     */
-    public array $listItemAttributes;
-
-    /**
-     * @var array Array of model attributes that can be used when displaying a single model. Defaults to all columns that are not.
-     */
-    public array $singleItemAttributes;
-
-    /**
      * @var array Array of actions that are available.
      */
     public array $actions = [];
 
-    public function __construct()
+    /**
+     * Column Definitions
+     *
+     * Available keys are:
+     *
+     * name: string - name of DB column
+     * dbType: string - type of the column in the DB; null for transient columns
+     * label: string - human readable name
+     * showInList: boolean - show this column in a list view?
+     * showOnSingleItem: boolean - show this column in a single item view?
+     * readonly: boolean - should this column be presented read-only?
+     * htmlType: select, radiogroup, checkboxgroup or https://www.w3schools.com/html/html_form_input_types.asp
+     * choices: array(value => label) - map of choices for type select, radiogroup of checkboxgroup
+     * placeholder: string - placeholder for html input element
+     * required: boolean - make html input element required?
+     * class: string - class attribute on html input element
+     * pattern: string - pattern attribute on the html input element
+     *
+     * @returns array Array of Column Definitions
+     */
+    public function columnDefinitions(): array
     {
-        $this->listItemAttributes = $this->getPublicModelColumns();
-        $this->singleItemAttributes = $this->listItemAttributes;
+        return [];
     }
 
     /**
-     * Returns all columns of the Resource's $model that are not $hidden
+     * Export Configs
+     *
+     * Available keys are:
+     *
+     * name: string
+     * query: fn ($query) => $query->doSomethingWithIt(...)
+     *
+     * Note that the $query passed to the query-fn is just the base query without sorting or searching.
+     * You can use addSearchClause($query, $search) to add the search clause in case you need it.
+     *
+     * @param ?string $search Search String
+     * @returns array Array of Export Configs
      */
-    public function getPublicModelColumns(): array
+    public function exportDefinitions(?string $search = null): array
     {
-        $model = new ($this->getModelClassName())();
-        $columns = Schema::connection($model->getConnectionName())->getColumnListing($model->getTable());
+        return [
+            ["name" => __("resources.export_default"), "query" => fn ($query) => $query],
+        ];
+    }
 
-        return array_diff($columns, $model->getHidden());
+    /**
+     * Append the $query such that a search is performed using the given $search string.
+     * The default implementation does nothing. Subclasses can override this to implement search.
+     *
+     * @param ?string $search
+     * @return mixed Return the modified $query
+     */
+    public function addSearchClause($query, ?string $search)
+    {
+        return $query;
     }
 
     public function list()
@@ -81,22 +111,11 @@ class Resource
      * Override this to customize.
      * Defaults to all items, i.e.: $this->getModelClassName()::query()
      *
-     * @return void
+     * @return mixed Query
      */
-    public function query()
+    public function query(): mixed
     {
         return $this->getModelClassName()::query();
-    }
-
-    /**
-     * Append the $query such that a search is performed using the given $search string.
-     * The default implementation does nothing. Subclasses can override this to implement search.
-     *
-     * @return mixed Return the modified $query
-     */
-    public function addSearchClause($query, string $search)
-    {
-        return $query;
     }
 
     /**
@@ -173,7 +192,8 @@ class Resource
             $query = $this->addSearchClause($query, $search);
         }
 
-        return $query->get()->map->only($this->listItemAttributes);
+        $columns = array_map(fn ($c) => $c['name'], $this->columnDefinitionsForList());
+        return $query->get()->map->only($columns);
     }
 
     /**
@@ -181,7 +201,22 @@ class Resource
      */
     public function getItem($id): array
     {
-        return $this->query()->find($id)->only($this->singleItemAttributes);
+        $columns = array_map(fn ($c) => $c['name'], $this->columnDefinitionsForSingleItem());
+        return $this->query()->find($id)->only($columns);
+    }
+
+    /**
+     * @return array columnDefinitions() where "showInList" is true^
+     */
+    public function columnDefinitionsForList(): array {
+        return array_filter($this->columnDefinitions(), (fn($c) => $c['showInList'] == true));
+    }
+
+    /**
+     * @return array columnDefinitions() where "showOnSingleItem" is true
+     */
+    public function columnDefinitionsForSingleItem(): array {
+        return array_filter($this->columnDefinitions(), (fn($c) => $c['showOnSingleItem'] == true));
     }
 
     public function getView(string $action)
