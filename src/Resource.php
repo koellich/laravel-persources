@@ -74,13 +74,14 @@ class Resource
      * Note that the $query passed to the query-fn is just the base query without sorting or searching.
      * You can use addSearchClause($query, $search) to add the search clause in case you need it.
      *
-     * @param ?string $search Search String
+     * @param  ?string  $search Search String
+     *
      * @returns array Array of Export Configs
      */
     public function exportDefinitions(?string $search = null): array
     {
         return [
-            ["name" => __("resources.export_default"), "query" => fn ($query) => $query],
+            ['name' => __('resources.export_default'), 'query' => fn ($query) => $query],
         ];
     }
 
@@ -88,7 +89,7 @@ class Resource
      * Append the $query such that a search is performed using the given $search string.
      * The default implementation does nothing. Subclasses can override this to implement search.
      *
-     * @param ?string $search
+     * @param  ?string  $search
      * @return mixed Return the modified $query
      */
     public function addSearchClause($query, ?string $search)
@@ -193,6 +194,7 @@ class Resource
         }
 
         $columns = array_map(fn ($c) => $c['name'], $this->columnDefinitionsForList());
+
         return $query->get()->map->only($columns);
     }
 
@@ -202,21 +204,24 @@ class Resource
     public function getItem($id): array
     {
         $columns = array_map(fn ($c) => $c['name'], $this->columnDefinitionsForSingleItem());
+
         return $this->query()->find($id)->only($columns);
     }
 
     /**
      * @return array columnDefinitions() where "showInList" is true^
      */
-    public function columnDefinitionsForList(): array {
-        return array_filter($this->columnDefinitions(), (fn($c) => $c['showInList'] == true));
+    public function columnDefinitionsForList(): array
+    {
+        return array_filter($this->columnDefinitions(), (fn ($c) => $c['showInList'] == true));
     }
 
     /**
      * @return array columnDefinitions() where "showOnSingleItem" is true
      */
-    public function columnDefinitionsForSingleItem(): array {
-        return array_filter($this->columnDefinitions(), (fn($c) => $c['showOnSingleItem'] == true));
+    public function columnDefinitionsForSingleItem(): array
+    {
+        return array_filter($this->columnDefinitions(), (fn ($c) => $c['showOnSingleItem'] == true));
     }
 
     public function getView(string $action)

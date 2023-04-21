@@ -141,7 +141,6 @@ class MakePersourceCommand extends Command
     }
 
     /**
-     * @param $model
      * @return string default column definitions based on the model's DB table's columns minus the $hidden columns
      */
     private function getColumnDefs($model)
@@ -165,15 +164,15 @@ class MakePersourceCommand extends Command
                 'string' => str_contains('email', $column) ? 'email' : 'text',
                 default => 'text'
             };
-            $pattern = match($dbType) {
-                'tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'integer'  => ", 'pattern' => '[0-9]+'",
+            $pattern = match ($dbType) {
+                'tinyint', 'smallint', 'mediumint', 'int', 'bigint', 'integer' => ", 'pattern' => '[0-9]+'",
                 'decimal', 'number', 'float', 'double' => ", 'pattern' => '[0-9.,]+'",
                 default => ''
             };
             $columnDefs .= "            ['name' => '$column', 'dbType' => '$dbType', 'label' => __('resources.$column'), 'showInList' => $showInList, 'showOnSingleItem' => $showOnSingleItem, 'readonly' => $readonly, 'htmlType' => '$htmlType'$pattern],\n";
         }
 
-        return $columnDefs . "        ]";
+        return $columnDefs.'        ]';
     }
 
     private function copyViews(string $pluralName, array $permissions)
