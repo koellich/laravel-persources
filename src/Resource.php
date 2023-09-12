@@ -2,7 +2,6 @@
 
 namespace Koellich\Persources;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Response;
 
@@ -78,7 +77,7 @@ class Resource
      *
      * @returns array Array of Export Configs
      */
-    public function exportDefinitions(?string $search = null): array
+    public function exportDefinitions(string $search = null): array
     {
         return [
             ['name' => __('resources.export_default'), 'query' => fn ($query) => $query],
@@ -160,7 +159,7 @@ class Resource
      *
      * @param  string  $search Search term (optional)
      */
-    public function getItemCount(?string $search = null): int
+    public function getItemCount(string $search = null): int
     {
         $query = $this->query();
         if ($search) {
@@ -180,7 +179,7 @@ class Resource
      * @param  string  $orderBy column to order by. Or null to omit order by clause
      * @param  string  $orderDirection ASC or DESC. Default: ASC
      */
-    public function getItems(int $offset = 0, ?int $count = null, ?string $search = null, ?string $orderBy = null, string $orderDirection = 'ASC')
+    public function getItems(int $offset = 0, int $count = null, string $search = null, string $orderBy = null, string $orderDirection = 'ASC')
     {
         $query = $this->query();
         if ($count) {
