@@ -33,11 +33,11 @@ class PersourcesController extends Controller
         $id = $request->route('id');
 
         return match ($action) {
-            'list' => $resource->list($request),
-            'view' => $resource->view($request, $id),
-            'create' => $resource->create($request),
-            'update' => $resource->update($request, $id),
-            'delete' => $resource->delete($request, $id)
+            'list' => $resource->list(),
+            'view' => $resource->view($id),
+            'create' => $resource->create($request->all()),
+            'update' => $resource->update($request->all(), $id),
+            'delete' => $resource->delete($id)
         };
     }
 }

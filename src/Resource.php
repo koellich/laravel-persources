@@ -124,9 +124,9 @@ class Resource
      *
      * @return \Illuminate\Http\Response|never
      */
-    public function create(Request $request)
+    public function create(array $values)
     {
-        $ok = $this->getModelClassName()::create($request->all());
+        $ok = $this->getModelClassName()::create($values);
 
         return $ok ? Response::noContent() : abort(400);
     }
@@ -136,9 +136,9 @@ class Resource
      *
      * @return \Illuminate\Http\Response|never
      */
-    public function update(Request $request, $id)
+    public function update(array $values, $id)
     {
-        $ok = $this->query()->find($id)->update($request->all());
+        $ok = $this->query()->find($id)->update($values);
 
         return $ok ? Response::noContent() : abort(400);
     }
