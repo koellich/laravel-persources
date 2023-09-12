@@ -36,7 +36,7 @@ class PersourcesController extends Controller
             'list' => $resource->list(),
             'view' => $resource->view($id),
             'create' => $resource->create($request->all()),
-            'update' => $resource->update($request->all(), $id),
+            'update' => $resource->update($id, $request->all()),
             'delete' => $resource->delete($id)
         };
     }

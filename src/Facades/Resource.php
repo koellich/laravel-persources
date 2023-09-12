@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static mixed list(Request $request)
- * @method static mixed view(Request $request, $id)
- * @method static mixed create(Request $request)
- * @method static mixed update(Request $request, $id)
+ * @method static mixed list()
+ * @method static mixed view($id)
+ * @method static mixed create(array $values)
+ * @method static mixed update($id, array $values)
  * @method static mixed delete($id)
  * @method static string getModelClassName()
  * @method static array getPermissions()

@@ -135,7 +135,7 @@ class Resource
      *
      * @return \Illuminate\Http\Response|never
      */
-    public function update(array $values, $id)
+    public function update($id, array $values)
     {
         $ok = $this->query()->find($id)->update($values);
 
