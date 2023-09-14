@@ -4,6 +4,7 @@ namespace Koellich\Persources\Http;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Koellich\Persources\Facades\Persources;
 
@@ -17,6 +18,10 @@ class PersourcesController extends Controller
         $permission = str_replace('persources.', '', $routeName->beforeLast('|'));
         if (! $permission) {
             abort(500, __('persources::translations.500_unnamed_route', ['route' => $request->path()]));
+        }
+
+        if (!Auth::user()) {
+            return redirect("/");
         }
 
         if (! Persources::checkPermission($permission)) {
