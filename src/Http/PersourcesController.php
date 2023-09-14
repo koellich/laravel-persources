@@ -20,8 +20,8 @@ class PersourcesController extends Controller
             abort(500, __('persources::translations.500_unnamed_route', ['route' => $request->path()]));
         }
 
-        if (!Auth::user()) {
-            return redirect("/");
+        if (! Auth::user()) {
+            return redirect('/');
         }
 
         if (! Persources::checkPermission($permission)) {
