@@ -127,9 +127,9 @@ class Resource
         if (! $dataset) {
             return $this->query();
         }
-        $ds = array_filter($this->datasets(), fn ($ds) => $ds['name'] == $dataset);
+        $ds = array_values(array_filter($this->datasets(), fn ($ds) => $ds['name'] == $dataset));
 
-        return count($ds) == 0 ? $this->query() : $ds['query']($this->query());
+        return count($ds) == 0 ? $this->query() : $ds[0]['query']($this->query());
     }
 
     /**
