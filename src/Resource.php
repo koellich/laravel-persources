@@ -63,24 +63,19 @@ class Resource
     }
 
     /**
-     * Export Configs
+     * Datasets are different sets of data (i.e. diefferent queries) that can be used to get items.
      *
      * Available keys are:
      *
      * name: string
      * query: fn ($query) => $query->doSomethingWithIt(...)
      *
-     * Note that the $query passed to the query-fn is just the base query without sorting or searching.
-     * You can use addSearchClause($query, $search) to add the search clause in case you need it.
-     *
-     * @param  ?string  $search Search String
-     *
-     * @returns array Array of Export Configs
+     * @returns array Array of Datasets
      */
-    public function exportDefinitions(string $search = null): array
+    public function datasets(): array
     {
         return [
-            ['name' => __('resources.export_default'), 'query' => fn ($query) => $query],
+            ['name' => __('resources.dataset_default'), 'query' => fn ($query) => $query],
         ];
     }
 
@@ -108,7 +103,8 @@ class Resource
 
     /**
      * Returns the query to be used for fetching the models, either for list or single items.
-     * Override this to customize.
+     * Override this to customize. Or use datasets() to allow for different queries.
+     *
      * Defaults to all items, i.e.: $this->getModelClassName()::query()
      *
      * @return mixed Query
@@ -116,6 +112,24 @@ class Resource
     public function query(): mixed
     {
         return $this->getModelClassName()::query();
+    }
+
+    /**
+     * Returns the query for the given $dataset.
+     * Override this to customize.
+     * Defaults to all items, i.e.: $this->getModelClassName()::query()
+     *
+     * @param string|null $dataset optional dataset name. if omitted, the query() is used.
+     *
+     * @return mixed Query
+     */
+    public function datasetQuery(?string $dataset = null)
+    {
+        if (!$dataset) {
+            return $this->query();
+        }
+        $ds = array_filter($this->datasets(), fn($ds) => $ds['name'] == $dataset);
+        return count($ds) == 0 ? $this->query() : $ds['query']($this->query());
     }
 
     /**
@@ -158,10 +172,11 @@ class Resource
      * Returns the item count using the query()
      *
      * @param  string  $search Search term (optional)
+     * @param  string  $dataset The dataset name (optional). If omitted, the query() will be used.
      */
-    public function getItemCount(string $search = null): int
+    public function getItemCount(string $search = null, string $dataset = null): int
     {
-        $query = $this->query();
+        $query = $this->datasetQuery($dataset);
         if ($search) {
             $query = $this->addSearchClause($query, $search);
         }
@@ -178,10 +193,12 @@ class Resource
      * @param  string  $search search term (optional). If present, the addSearchClause($query) function will be called.
      * @param  string  $orderBy column to order by. Or null to omit order by clause
      * @param  string  $orderDirection ASC or DESC. Default: ASC
+     * @param  string  $dataset The dataset name (optional). If omitted, the query() will be used.
      */
-    public function getItems(int $offset = 0, int $count = null, string $search = null, string $orderBy = null, string $orderDirection = 'ASC')
+    public function getItems(int $offset = 0, int $count = null, string $search = null,
+                             string $orderBy = null, string $orderDirection = 'ASC', string $dataset = null)
     {
-        $query = $this->query();
+        $query = $this->datasetQuery($dataset);
         if ($count) {
             $query = $query->take($count)->skip($offset);
         }
@@ -290,4 +307,5 @@ class Resource
     {
         return __('resources.'.strtolower($this->pluralName));
     }
+
 }
