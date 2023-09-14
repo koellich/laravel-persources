@@ -62,23 +62,19 @@ class %RESOURCE% extends Resource
     }
 
     /**
-     * Export Configs
+     * Datasets are different sets of data (i.e. diefferent queries) that can be used to get items.
      *
      * Available keys are:
      *
      * name: string
      * query: fn ($query) => $query->doSomethingWithIt(...)
      *
-     * Note that the $query passed to the query-fn is just the base query without sorting or searching.
-     * You can use addSearchClause($query, $search) to add the search clause in case you need it.
-     *
-     * @param ?string $search Search String
-     * @returns array Array of Export Configs
+     * @returns array Array of Datasets
      */
-    public function exportDefinitions(?string $search = null): array
+    public function datasets(): array
     {
         return [
-            ["name" => __("resources.export_default"), "query" => fn ($query) => $query],
+            ['name' => __('resources.dataset_default'), 'query' => fn ($query) => $query],
         ];
     }
 
