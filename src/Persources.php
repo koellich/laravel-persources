@@ -78,13 +78,15 @@ class Persources
     public function checkPermission(string $permission): bool
     {
         $user = Auth::user();
+        if (!$user) {
+            return false;
+        }
         $adminRole = config('persources.admin_role');
         if ($adminRole && $user->hasRole($adminRole)) {
             return true;
         }
         try {
             $user->getAllPermissions()->sole(fn ($p) => $p->name == $permission);
-
             return true;
         } catch (ItemNotFoundException) {
             return false;
