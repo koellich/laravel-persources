@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string translatedModelName()
  * @method static string translatedModelNamePlural()
  * @method static array columnDefinitions()
- * @method static array exportDefinitions()
+ * @method static array datasets()
  *
  * @see \Koellich\Persources\Resource
  */
