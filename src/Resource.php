@@ -119,16 +119,16 @@ class Resource
      * Override this to customize.
      * Defaults to all items, i.e.: $this->getModelClassName()::query()
      *
-     * @param string|null $dataset optional dataset name. if omitted, the query() is used.
-     *
+     * @param  string|null  $dataset optional dataset name. if omitted, the query() is used.
      * @return mixed Query
      */
-    public function datasetQuery(?string $dataset = null)
+    public function datasetQuery(string $dataset = null)
     {
-        if (!$dataset) {
+        if (! $dataset) {
             return $this->query();
         }
-        $ds = array_filter($this->datasets(), fn($ds) => $ds['name'] == $dataset);
+        $ds = array_filter($this->datasets(), fn ($ds) => $ds['name'] == $dataset);
+
         return count($ds) == 0 ? $this->query() : $ds['query']($this->query());
     }
 
@@ -196,7 +196,7 @@ class Resource
      * @param  string  $dataset The dataset name (optional). If omitted, the query() will be used.
      */
     public function getItems(int $offset = 0, int $count = null, string $search = null,
-                             string $orderBy = null, string $orderDirection = 'ASC', string $dataset = null)
+        string $orderBy = null, string $orderDirection = 'ASC', string $dataset = null)
     {
         $query = $this->datasetQuery($dataset);
         if ($count) {
@@ -307,5 +307,4 @@ class Resource
     {
         return __('resources.'.strtolower($this->pluralName));
     }
-
 }
